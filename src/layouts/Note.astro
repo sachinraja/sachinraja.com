@@ -1,0 +1,50 @@
+---
+import { formatDate } from '../utils'
+import BasePage from './BasePage.astro'
+
+export interface Props {
+  content: {
+    title: string
+    description: string
+    pubDate: string
+    updatedDate?: string
+  }
+}
+
+const {
+  content: { title, description, pubDate, updatedDate },
+} = Astro.props
+
+const publishedAt = formatDate(new Date(pubDate))
+---
+
+<BasePage baseHead={{ title, description }}>
+  <article class="m-auto">
+    <div class="flex flex-col items-center space-y-2 my-4">
+      <h1
+        class="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-sky-200 via-sky-300 to-sky-100"
+      >
+        {title}
+      </h1>
+      {pubDate && <time class="text-2xl text-gray-500">{publishedAt}</time>}
+      {
+        updatedDate && (
+          <div>
+            Last updated on <time>{updatedDate}</time>
+          </div>
+        )
+      }
+    </div>
+    <div
+      class:list={[
+        'm-auto',
+        'prose text-gray-400 max-w-none',
+        'prose-md md:prose-lg xl:prose-xl',
+        'prose-a:text-gray-300 prose-a:no-underline prose-a:border-b prose-a:border-blue-500 hover:prose-a:border-b-2',
+        'prose-code:text-gray-300 prose-headings:text-gray-300 prose-strong:text-gray-500',
+      ]}
+    >
+      <slot />
+    </div>
+  </article>
+</BasePage>
