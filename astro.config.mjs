@@ -5,11 +5,13 @@ import tailwind from '@astrojs/tailwind'
 import remarkTwoslashPkg from 'remark-shiki-twoslash'
 
 /**
- * @type {typeof remarkTwoslash}
+ * @type {import('remark-shiki-twoslash').Options}
  */
-const shikiTwoslash = remarkTwoslashPkg.default
+const shikiConfig = {
+  theme: 'github-dark',
+}
+const remarkTwoslash = [remarkTwoslashPkg.default, shikiConfig]
 
-const remarkTwoslash = [shikiTwoslash, { theme: 'github-dark' }]
 // https://astro.build/config
 export default defineConfig({
   site: 'https://s4n.land',
