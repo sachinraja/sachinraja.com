@@ -1,0 +1,7 @@
+---
+export interface Props extends astroHTML.JSX.AnchorHTMLAttributes {}
+---
+
+<a class="text-gray-300 underline" {...Astro.props}>
+  <slot />
+</a>

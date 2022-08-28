@@ -18,9 +18,14 @@ const posts = (
   <section>
     {
       posts.map((post) => (
-        <a href={post.url}>
+        <a class="group" href={post.url}>
           <article class="m-auto">
-            <h2 class="text-2xl font-bold text-gray-300">
+            <h2
+              class:list={[
+                'text-2xl font-bold bg-clip-text text-transparent bg-gray-300',
+                'group-hover:bg-gradient-to-r group-hover:from-sky-200 group-hover:via-sky-300 group-hover:to-sky-100',
+              ]}
+            >
               {post.frontmatter.title}
             </h2>
             <time class="text-xl" datetime={post.frontmatter.pubDate}>
