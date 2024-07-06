@@ -1,2 +1,2 @@
-export const SITE_TITLE = 'Sachin'
-export const SITE_DESCRIPTION = 'my place for scattered thoughts'
+export const SITE_TITLE = 'Sachin Raja'
+export const SITE_DESCRIPTION = 'Posts, thoughts, and projects from Sachin Raja'

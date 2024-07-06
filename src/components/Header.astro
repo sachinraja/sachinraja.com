@@ -1,6 +1,5 @@
 ---
 import HeaderLink from './HeaderLink.astro'
-import { Icon } from 'astro-icon'
 
 export interface Props {
   class?: string
@@ -10,14 +9,7 @@ const { class: className } = Astro.props
 ---
 
 <header class={className}>
-  <nav class="flex space-x-4 items-center">
-    <HeaderLink href="/">Home</HeaderLink>
-    <HeaderLink href="/notes">Notes</HeaderLink>
-    <HeaderLink href="https://github.com/sachinraja" target="_blank">
-      <Icon class="w-6" name="feather:github" />
-    </HeaderLink>
-    <HeaderLink href="https://twitter.com/s4chinraja" target="_blank">
-      <Icon class="w-6" name="feather:twitter" />
-    </HeaderLink>
+  <nav class="flex items-center">
+    <HeaderLink href="/">Sachin Raja</HeaderLink>
   </nav>
 </header>

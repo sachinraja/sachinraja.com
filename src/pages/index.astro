@@ -1,41 +1,28 @@
 ---
-import Icon from 'astro-icon'
-import HomeCard from '../components/HomeCard.astro'
-import HomeLink from '../components/HomeLink.astro'
-import TrpcIcon from '../components/TrpcIcon.astro'
 import BasePage from '../layouts/BasePage.astro'
+import { formatMonth, formatYear, getPosts } from '../utils'
+
+const posts = await getPosts()
+const sortedPosts = posts.sort((a, b) => {
+  return b.data.publishedAt.getTime() - a.data.publishedAt.getTime()
+})
 ---
 
 <BasePage>
   <div class="flex flex-col space-y-4">
-    <HomeCard>
-      <TrpcIcon slot="icon" class="w-10 fill-[#2596be]" />
-      <Fragment slot="text">
-        <HomeLink href="https://trpc.io" target="_blank">tRPC</HomeLink>
-        core team member
-      </Fragment>
-    </HomeCard>
-    <HomeCard>
-      <Icon
-        slot="icon"
-        name="simple-icons:typescript"
-        class="w-10 text-[#3178C6]"
-      />
-      <Fragment slot="text">
-        <HomeLink href="https://www.typescriptlang.org/" target="_blank">
-          TypeScript
-        </HomeLink>
-        enthusiast
-      </Fragment>
-    </HomeCard>
-    <HomeCard>
-      <img
-        slot="icon"
-        class="w-10 rounded select-none"
-        draggable={false}
-        src="https://avatars.githubusercontent.com/u/58836760?s=40"
-      />
-      <Fragment slot="text">human</Fragment>
-    </HomeCard>
+    {
+      sortedPosts.map((post) => (
+        <a class="flex space-x-2 group" href={post.slug}>
+          {post.data.draft && <span class="text-red-500">Draft</span>}
+          {/* prettier-ignore */}
+          <time datetime={post.data.publishedAt.toISOString()}>
+            {formatMonth(post.data.publishedAt)}.{formatYear(post.data.publishedAt)}
+          </time>
+          <span class="underline text-base group-hover:text-cyan-300/90">
+            {post.data.title}
+          </span>
+        </a>
+      ))
+    }
   </div>
 </BasePage>

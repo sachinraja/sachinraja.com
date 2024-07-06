@@ -1,5 +1,5 @@
 {
-  "name": "s4n.land",
+  "name": "sachinraja.com",
   "private": true,
   "scripts": {
     "dev": "astro dev",
@@ -7,20 +7,17 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "format": "prettier -w --plugin-search-dir=. ."
+    "format": "prettier . --write"
   },
   "devDependencies": {
-    "@astrojs/mdx": "^0.10.2",
-    "@astrojs/rss": "^1.0.0",
-    "@astrojs/sitemap": "^1.0.0",
-    "@astrojs/tailwind": "^1.0.0",
-    "@tailwindcss/typography": "0.5.4",
-    "astro": "^1.1.1",
-    "astro-icon": "0.7.3",
-    "prettier": "2.7.1",
-    "prettier-plugin-astro": "0.5.3",
-    "remark-shiki-twoslash": "3.1.0",
-    "tailwindcss": "3.1.8",
-    "unocss": "0.45.13"
+    "@astrojs/mdx": "3.1.2",
+    "@astrojs/rss": "4.0.7",
+    "@astrojs/sitemap": "3.1.6",
+    "@astrojs/tailwind": "5.1.0",
+    "@tailwindcss/typography": "0.5.13",
+    "astro": "4.11.5",
+    "prettier": "3.3.2",
+    "prettier-plugin-astro": "0.14.0",
+    "tailwindcss": "3.4.4"
   }
 }

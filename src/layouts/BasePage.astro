@@ -1,5 +1,6 @@
 ---
-import BaseHead, { Props as BaseHeadProps } from '../components/BaseHead.astro'
+import BaseHead from '../components/BaseHead.astro'
+import type { Props as BaseHeadProps } from '../components/BaseHead.astro'
 import Header from '../components/Header.astro'
 import { SITE_DESCRIPTION, SITE_TITLE } from '../config'
 
@@ -9,7 +10,6 @@ export interface Props {
 }
 
 const {
-  header = true,
   baseHead = {
     title: SITE_TITLE,
     description: SITE_DESCRIPTION,
@@ -17,14 +17,13 @@ const {
 } = Astro.props
 ---
 
-<!DOCTYPE html>
 <html lang="en-us">
   <head>
     <BaseHead {...baseHead} />
   </head>
-  <body class="bg-gray-900 text-gray-400">
-    <div class="w-4/5 sm:w-3/4 lg:w-1/2 m-auto mb-20">
-      {header && <Header class="mt-8" />}
+  <body class="bg-zinc-950 text-zinc-300/90">
+    <div class="w-4/5 md:w-2/3 lg:w-3/5 xl:w-1/2 m-auto mb-20">
+      <Header class="mt-8" />
       <main class="mt-6">
         <slot />
       </main>
