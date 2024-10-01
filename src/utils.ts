@@ -1,4 +1,8 @@
-import { getCollection } from 'astro:content'
+import {
+  getCollection,
+  type CollectionEntry,
+  type ContentEntryMap,
+} from 'astro:content'
 
 export function formatDate(date: Date) {
   return date.toLocaleDateString('en-us', {
@@ -29,4 +33,13 @@ export function getPosts() {
   }
 
   return getCollection('posts', ({ data }) => !data.draft)
+}
+
+export function sortPosts(posts: CollectionEntry<'posts'>[]) {
+  return posts.sort((a, b) => {
+    return (
+      new Date(b.data.publishedAt).getTime() -
+      new Date(a.data.publishedAt).getTime()
+    )
+  })
 }

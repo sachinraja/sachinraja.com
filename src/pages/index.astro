@@ -1,11 +1,9 @@
 ---
 import BasePage from '../layouts/BasePage.astro'
-import { formatMonth, formatYear, getPosts } from '../utils'
+import { formatMonth, formatYear, getPosts, sortPosts } from '../utils'
 
 const posts = await getPosts()
-const sortedPosts = posts.sort((a, b) => {
-  return b.data.publishedAt.getTime() - a.data.publishedAt.getTime()
-})
+const sortedPosts = sortPosts(posts)
 ---
 
 <BasePage>
