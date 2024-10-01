@@ -157,6 +157,13 @@ declare module 'astro:content' {
   collection: "posts";
   data: InferEntrySchema<"posts">
 } & { render(): Render[".md"] };
+"trial-by-fire-vercel/post.md": {
+	id: "trial-by-fire-vercel/post.md";
+  slug: "trial-by-fire-vercel";
+  body: string;
+  collection: "posts";
+  data: InferEntrySchema<"posts">
+} & { render(): Render[".md"] };
 "uproot.md": {
 	id: "uproot.md";
   slug: "uproot";
