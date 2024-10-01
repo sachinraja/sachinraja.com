@@ -15,7 +15,7 @@ export function formatDate(date: Date) {
 
 export function formatMonth(date: Date) {
   return date.toLocaleDateString('en-us', {
-    month: 'numeric',
+    month: '2-digit',
     timeZone: 'UTC',
   })
 }
