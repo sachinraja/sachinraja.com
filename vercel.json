@@ -1,8 +1,0 @@
-{
-  "rewrites": [
-    {
-      "source": "/resume",
-      "destination": "/resume.pdf"
-    }
-  ]
-}

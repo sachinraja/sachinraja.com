@@ -11,7 +11,7 @@ Growing is hard. It's not just getting to the growth that's difficult but also b
 
 This summer I interned at [Vercel](https://vercel.com/), a company building a cloud for web development. The idea is that they offer all the infrastructure you'll need to build a website so you can focus on work that directly impacts on your users.
 
-![Team](./team.png)
+![Team](/trial-by-fire-vercel/team.png)
 
 One of the first moments at Vercel that stuck with me is when I presented my project at RWC “Response with Comments,” an organized meeting to reply to RFCs. I was a bit nervous, which was probably visible, but I managed to get through the whole presentation. As I finished and the floor opened up to feedback, I noticed our CTO was one of the people talking! This had the opposite effect on me than you would think. I realized that all these people were engineers, not judges, here to help bring the project to fruition, not tear it down. The same team energy that pervades Vercel is so strong that no one is too self-important to not be involved. And that is how Vercel operates, there is a strong bias towards action. If you want to do something, chances are the stakeholders will let you do it. Acting under the assumption that blockers will be resolved translates into a lot of initial momentum, allowing projects to move quickly past the incubation phase into implementation.
 
@@ -27,13 +27,13 @@ I interned on the Core Platform team and honestly I wasn't exactly sure what the
 
 Every request to Vercel is received by the [Edge Network](https://vercel.com/docs/edge-network/overview), a globally distributed system which ensures fast response times by operating close to users. This includes both customer deployments and the Vercel API. The problem with that is tightly coupling unrelated software components greatly complicates the development process. An update to one necessitates an update to all, whether there's actually a dependency or not. I was tasked with the ambitious goal of decoupling deployment routing logic from internal API routing logic to decrease the amount of programs you have to touch to add/remove/change an API service. Here's an overview of the system:
 
-![Edge Network Overview](./edge-network-before.png)
+![Edge Network Overview](/trial-by-fire-vercel/edge-network-before.png)
 
 Every request hits the reverse proxy “Now Proxy.” It determines what deployment a request corresponds to or, if it's for `vercel.com/api/*`, what backend API service it corresponds to.
 
 The goal was to get it to look like this:
 
-![Edge Network Overview with API Proxy](./edge-network-after.png)
+![Edge Network Overview with API Proxy](/trial-by-fire-vercel/edge-network-after.png)
 
 Why? “API Proxy” is a completely separate reverse proxy service, which means updates to API routing logic can be isolated to it. There's no need to even touch Now Proxy under this setup, enabling several benefits:
 
@@ -61,7 +61,7 @@ Finally getting to deploy API Proxy felt amazing. However, I was badly mistaken 
 
 ### _The Second Incident_
 
-![API Proxy memory showing logistic growth](./api-proxy-memory-growth.png)
+![API Proxy memory showing logistic growth](/trial-by-fire-vercel/api-proxy-memory-growth.png)
 
 I woke up one morning and checked the service's logs only to find there were _none_ in one of our regions, so we were either serving zero requests in that region or dropping logs. The latter seemed more likely. At the same time the monitor for the memory usage of each pod showed the memory steadily increasing for a few hours before flatlining at the [memory limit](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/). Concerned it was a memory leak, my mentor and I investigated immediately and believed it was related to our log files. To prevent the NGINX access log from growing infinitely we were [rotating logs](https://en.wikipedia.org/wiki/Log_rotation#:~:text=In%20information%20technology%2C%20log%20rotation,metrics%20that%20can%20apply%20here) once they reached 1 GB. We thought this might be the cause because our memory limit was set to 512 MB, but lowering the maximum log file size didn't fix it. That sort of led us astray but we also noticed NGINX also wasn't properly [re-opening log files](https://nginx.org/en/docs/control.html#logs) after rotation and continued writing to the old one. But alas, it couldn't be that easy either. Finally we arrived at the epic conclusion that there was no memory leak in the first place. We had wondered from the beginning why the pods hovered at the memory limit instead of going over and getting killed. In [this GitHub issue](https://github.com/kubernetes/kubernetes/issues/43916) we found out that Kubernetes was actually including the page cache in the calculation for memory limits. The page cache was steadily growing because we were opening multiple log files and writing to them. Thus, the memory flatlined after because as the pod hit the memory limit, it evicted page cache entries to make space for the more essential work being done.
 
