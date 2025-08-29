@@ -5,7 +5,7 @@ import { LuGithub } from 'react-icons/lu'
 export function Socials() {
 	return (
 		<div className="flex flex-row gap-4">
-			<Link href="https://twitter.com/sachinraja" target="_blank">
+			<Link href="https://x.com/s4chinraja" target="_blank">
 				<FaXTwitter size={20} />
 			</Link>
 			<Link href="https://github.com/sachinraja" target="_blank">
