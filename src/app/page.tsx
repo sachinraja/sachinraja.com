@@ -14,7 +14,10 @@ export default function HomePage() {
 				{releasedPosts.map((post) => (
 					<li key={post.slug}>
 						<div className="flex flex-row items-center gap-2 text-lg">
-							<time dateTime={post.publishedAt.toISOString()}>
+							<time
+								className="font-mono"
+								dateTime={post.publishedAt.toISOString()}
+							>
 								{post.publishedAt.toLocaleDateString('en-us', {
 									month: '2-digit',
 									year: '2-digit',

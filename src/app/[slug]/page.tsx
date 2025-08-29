@@ -1,15 +1,68 @@
 import { MDXContent } from '@content-collections/mdx/react'
 import { allPosts } from 'content-collections'
+import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import type { ComponentProps } from 'react'
 import { Socials } from '@/components/socials'
+import { getReleasedPosts } from '@/lib/utils'
 
 export const dynamicParams = false
 
 export function generateStaticParams() {
-	return allPosts.map((post) => ({ slug: post.slug }))
+	return getReleasedPosts(allPosts).map((post) => ({ slug: post.slug }))
+}
+
+// stolen from bengubler.com
+export async function generateMetadata({
+	params,
+}: {
+	params: Promise<{ slug: string }>
+}): Promise<Metadata> {
+	const { slug } = await params
+	const post = getReleasedPosts(allPosts).find((p) => p.slug === slug)
+
+	if (!post) {
+		return {
+			title: 'Post Not Found',
+		}
+	}
+
+	const ogParams = new URLSearchParams({
+		title: post.title,
+		description: post.description,
+		type: 'post',
+	})
+	const ogImageUrl = `/og?${ogParams.toString()}`
+
+	return {
+		title: post.title,
+		description: post.description,
+		authors: [{ name: 'Sachin Raja', url: 'https://sachinraja.com' }],
+		openGraph: {
+			title: post.title,
+			description: post.description,
+			type: 'article',
+			publishedTime: post.publishedAt.toISOString(),
+			authors: ['Sachin Raja'],
+			images: [
+				{
+					url: ogImageUrl,
+					width: 1200,
+					height: 630,
+					alt: post.title,
+				},
+			],
+		},
+		twitter: {
+			card: 'summary_large_image',
+			title: post.title,
+			description: post.description,
+			creator: '@s4chinraja',
+			images: [ogImageUrl],
+		},
+	}
 }
 
 export default async function BlogPage({
