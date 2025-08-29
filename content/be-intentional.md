@@ -1,7 +1,7 @@
 ---
 title: Be Intentional
 description: be intentional about what you do, retain your mind in the LLM era
-publishedAt: 2025-08-28
+publishedAt: 2025-08-29
 slug: be-intentional
 ---
 
