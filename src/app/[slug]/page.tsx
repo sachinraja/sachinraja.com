@@ -32,7 +32,6 @@ export async function generateMetadata({
 	const ogParams = new URLSearchParams({
 		title: post.title,
 		description: post.description,
-		type: 'post',
 	})
 	const ogImageUrl = `/og?${ogParams.toString()}`
 
