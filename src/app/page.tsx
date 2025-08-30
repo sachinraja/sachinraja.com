@@ -1,6 +1,6 @@
 import { allPosts } from 'content-collections'
 import Link from 'next/link'
-import { Socials } from '@/components/socials'
+import { Footer, Socials, SocialsFooter } from '@/components/socials'
 import { getReleasedPosts } from '@/lib/utils'
 
 export default function HomePage() {
@@ -32,7 +32,7 @@ export default function HomePage() {
 			</ul>
 
 			<footer className="mt-5">
-				<Socials />
+				<SocialsFooter />
 			</footer>
 		</main>
 	)

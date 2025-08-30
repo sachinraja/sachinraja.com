@@ -5,7 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import type { ComponentProps } from 'react'
-import { Socials } from '@/components/socials'
+import { Footer } from '@/components/socials'
 import { getReleasedPosts } from '@/lib/utils'
 
 export const dynamicParams = false
@@ -138,7 +138,7 @@ export default async function BlogPage({
 				</div>
 
 				<footer className="mt-5">
-					<Socials />
+					<Footer />
 				</footer>
 			</div>
 		</main>
