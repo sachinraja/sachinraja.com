@@ -24,7 +24,7 @@ export default function HomePage() {
 								})}
 							</time>
 							<Link href={`/${post.slug}`}>
-								<h2 className="border-b-1">{post.title}</h2>
+								<h2 className="underline underline-offset-8">{post.title}</h2>
 							</Link>
 						</div>
 					</li>

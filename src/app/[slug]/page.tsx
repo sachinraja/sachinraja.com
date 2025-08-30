@@ -36,6 +36,7 @@ export async function generateMetadata({
 	const ogImageUrl = `/og?${ogParams.toString()}`
 
 	return {
+		metadataBase: new URL('https://sachinraja.com'),
 		title: post.title,
 		description: post.description,
 		authors: [{ name: 'Sachin Raja', url: 'https://sachinraja.com' }],
