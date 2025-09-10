@@ -8,6 +8,14 @@ const nextConfig: NextConfig = {
 			destination: '/resume.pdf',
 		},
 	],
+	images: {
+		remotePatterns: [
+			{
+				protocol: 'https',
+				hostname: 'sachinraja.com',
+			},
+		],
+	},
 }
 
 export default withContentCollections(nextConfig)
