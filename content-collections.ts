@@ -12,7 +12,11 @@ const posts = defineCollection({
 	schema: z.object({
 		title: z.string(),
 		description: z.string(),
-		publishedAt: z.coerce.date(),
+		publishedAt: z.coerce.date().transform((date) => {
+			// since date is specified in PST we need to add 8 hours to get the correct date in UTC
+			const pstDate = new Date(date.getTime() + 8 * 60 * 60 * 1000)
+			return pstDate
+		}),
 		slug: z.string(),
 		draft: z.boolean().optional(),
 	}),
