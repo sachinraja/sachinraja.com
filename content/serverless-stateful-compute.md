@@ -1,0 +1,44 @@
+---
+title: serverless stateful compute
+description: sandboxes are not serverless
+publishedAt: 2026-10-22
+slug: serverless-stateful-compute
+---
+Serverless is inherently a billing model. Vercel knew this early and part of the primary appeal is that they speak this language. Serverless functions, sandboxes, daemons, queues, blob storage, etc. all boil down to the same thing: they're billed by active usage of the resource. Their marketing even centers around this. Active CPU, bytes read/written. Egress fees are serverless, you're charged per byte, not for a fixed amount of bytes/sec on a link. (Cloudflare's zero egress fees are perhaps surprisingly not serverless and more analogous to Costco hotdogs than Costco itself.) This is powerful and provides a definition of serverless broad enough to include most providers that brand themselves as such.
+
+In a way, you're like Costco, you buy in bulk directly from manufacturers and pass on the savings to your customers. If demand doesn't meet what you expect, or you're not able to sufficiently utilize the bulk resource, you lose money. How weird would it be if Costco made you pay for the resource that they're not using. They didn't have to use them in the first place!! If you didn't have elastic capacity, you'd instead be a market like AWS, but you do, so you're a serverless provider. Customers ultimately pay for compute, not time.
+
+Users don't care if you call it serverless and keep their servers running forever. At the end of the day, they only care about what they're charged for. As long as you implement this billing paradigm you can build whatever implementation you would like that supports it. The simplest one: start their server in a VM and keep it alive forever. Pack the host as tightly as possible while ensuring it can still survive bursts. This is how active CPU sandbox providers function.
+
+To use this model for all types of compute though would be expensive and inefficient. Even if that server isn't doing anything, you're paying the cost of a guest kernel and idle memory, and the billing model says you're not to make money on idle time. But you must maximize utilization, AWS is charging you for all those vCPUs either way. So to compensate, you add a layer for serverless functions, automatically terminate the VM after some grace period. Reclaim the memory and allocate it to something else.
+
+That's the easy part though. Serverless functions are entirely stateless by nature. How do you do this for stateful services? Sandboxes, databases, anywhere you're persistently putting bytes and expecting to be able to read the same ones later. Databases are difficult, you must carefully engineer them to support the billing model, it's not good enough to just keep the data on a local high-speed block device. You must be able to snapshot it and move it off compute into cold storage at any time. Customers only pay for what they use. So instead of a traditional WAL on local disk, you do a WAL with distributed consensus. You still want high write throughput so you do this on multiple SSD nodes and asynchronously flush it to S3. Compute and storage are separated, you only pay for active CPU. Need to auto-scale? Spin up a read replica connected to the same storage backend.
+
+This hasn't fully hit the world of sandboxes yet. In an attempt to make sandboxes as serverless as possible, providers have introduced layers of sandbox idling.
+1. When a sandbox idles on CPU cores, provisioned CPU billing stops. This is active CPU, although a meter for the idle memory remains.
+2. When a sandbox has no foreground processes executing and no incoming or outgoing traffic for some predetermined amount of time, the sandbox is automatically paused and the memory is snapshotted.
+3. When the guest is not running any persistent services (background processes) and all writes are flushed to some persistent block device, the sandbox can safely be stopped with only a snapshot of the block device.
+
+The first layer is necessary. Pausing a sandbox before every command and resuming it after would pay the cost of a full memory snapshot and resume. The second step is necessary to preserve persistent processes. The third step is necessary as ultimately only the user can really determine when it’s safe to stop.
+
+For ephemeral processes though, we can skip all the way to the last layer. After they’re done executing, writes can be flushed, and the sandbox can be safely stopped. Now imagine a hundred of these ephemeral processes. You may not even be able to fit them into a single sandbox on any particular host. Here is where the underlying technology for most providers suffers from a key limitation: the underlying block device can only be bound to a single sandbox at a time.
+
+To unlock the full capabilities of serverless stateful compute, storage and compute must again fully be separated. This is difficult precisely because sandboxes are an attempt at *arbitrary* stateful compute. Durable Objects and Neon databases can be serverless since they store state in a highly restricted (albeit powerful) way.
+
+Arbitrary stateful compute (sandboxes) must be reimagined as storage first, rather than compute first. We can place a slight restriction on state in return for greater freedom of implementation: your block device is the point of synchronization. This seemingly simple inversion of priority unlocks incredible benefits.
+
+What if, instead of just storing SQLite or Postgres WAL entries, you could store arbitrary bytes in a familiar place? Imagine a networked storage device, one that can be hooked up to any sandbox to run services on top of and execute commands on. It's easy to see how you make this serverless. When a command needs to be executed, hook it up to a VM, when it's done, unhook it. Sandboxes return to their roots: ephemeral compute. Need to auto-scale? Spin up another VM connected to the same storage device.
+
+By decoupling storage from compute, we've now removed the limitation that sandboxes and persistent block devices are 1:1. Bash becomes an interface, a protocol for interacting with storage, like SQL is for databases. There's no reason every bash command should require starting up a VM, executing the command using an actual bash interpreter, and then winding down the VM and disconnecting the filesystem. This is extremely expensive, and for what? So your agent can execute a simple `sed` on a few files? Just like SQL, bash needs a query planner. Some commands can be executed by requesting data directly from the filesystem entirely without a VM. Some commands are ephemeral but require a VM, so they can quickly be executed and the VM can idle for some grace period before shutting down (remind you of anything?). Other commands start long-running services and can be routed to a sandbox with provisioned capacity.
+
+At [Archil](https://archil.com/), we are realizing this vision for serverless intelligence. We've invested two years in building a networked filesystem that safely and consistently supports this concurrency with high throughput. On top of this, we've built serverless exec, a disk-first mechanism for stateful compute.
+```typescript
+const files = await disk.grep({
+  directory: "logs",
+  pattern: "ERROR|FATAL",
+})
+const logs = await disk.exec("sed -i 's/foo/bar/g' src/index.ts")
+```
+Commands are fanned out in parallel across multiple microVMs mounting the same filesystem. `disk.grep` starts a set of worker microVMs processing the same data. You only pay for the commands you execute and you don't think about *where* they execute.
+
+To fully live up to its potential, serverless stateful compute requires a new paradigm. Agents will continue to consume compute at unprecedented scale and we must find ways to effectively satiate that demand. They never asked for a VM with provisioned capacity running on some host. They just need a scalable filesystem and place to run some bash.
