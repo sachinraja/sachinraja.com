@@ -1,9 +1,10 @@
----
-title: the 2026 AI infra startup template
-description: fork any startup
-publishedAt: 2026-07-13
-slug: 2026-ai-infra-startup-template
----
+export const metadata = {
+  title: 'the 2026 AI infra startup template',
+  description: 'fork any startup',
+  publishedAt: '2026-07-13',
+  slug: '2026-ai-infra-startup-template'
+}
+
 I was scrolling the list of hot, new AI infra YC startups, as one does, and before completely developing psychosis, I began to realize something. ProjectX, kernel, s2, Brawndo, Zingly (ok yes the last two aren't real, but does it matter if you can’t tell?). What’s the one thing all these startups building for agents have in common? They’re managed networked linux services that can be shared, snapshotted, and forked. Now, what exactly gets snapshotted depends on the service. For browsers, it’s the cookies and session state. For sandboxes, it’s the entire filesystem and RAM. It doesn’t matter, they can all be simplified down to a single underlying primitive: the filesystem. (Yes, of course they also have their own firecracker VM infra but that’s hardly interesting enough to talk about anymore.)
 
 I argue that by implementing a necessary set of operations for the filesystem, those operations can also be implemented for any managed linux application. I like to reason about examples so let's just apply this logic to a few startups, working with the assumption that we have the ability to share, snapshot, and fork a filesystem.

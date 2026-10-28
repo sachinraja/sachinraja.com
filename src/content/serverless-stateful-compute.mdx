@@ -1,9 +1,10 @@
----
-title: serverless stateful compute
-description: sandboxes are not serverless
-publishedAt: 2026-10-22
-slug: serverless-stateful-compute
----
+export const metadata = {
+	title: 'serverless stateful compute',
+	description: 'sandboxes are not serverless',
+	publishedAt: '2026-10-22',
+	slug: 'serverless-stateful-compute',
+}
+
 Serverless is inherently a billing model. Vercel knew this early and part of the primary appeal is that they speak this language. Serverless functions, sandboxes, daemons, queues, blob storage, etc. all boil down to the same thing: they're billed by active usage of the resource. Their marketing even centers around this. Active CPU, bytes read/written. Egress fees are serverless, you're charged per byte, not for a fixed amount of bytes/sec on a link. (Cloudflare's zero egress fees are perhaps surprisingly not serverless and more analogous to Costco hotdogs than Costco itself.) This is powerful and provides a definition of serverless broad enough to include most providers that brand themselves as such.
 
 In a way, you're like Costco, you buy in bulk directly from manufacturers and pass on the savings to your customers. If demand doesn't meet what you expect, or you're not able to sufficiently utilize the bulk resource, you lose money. How weird would it be if Costco made you pay for the resource that they're not using. They didn't have to use them in the first place!! If you didn't have elastic capacity, you'd instead be a market like AWS, but you do, so you're a serverless provider. Customers ultimately pay for compute, not time.

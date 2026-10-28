@@ -1,17 +1,16 @@
-import { allPosts } from 'content-collections'
 import Link from 'next/link'
-import { Footer, Socials, SocialsFooter } from '@/components/socials'
-import { getReleasedPosts } from '@/lib/utils'
+import { SocialsFooter } from '@/components/socials'
+import { getPosts } from '@/lib/utils'
 
 export default function HomePage() {
-	const releasedPosts = getReleasedPosts(allPosts)
+	const posts = getPosts().filter((post) => !post.draft)
 
 	return (
 		<main className="m-10">
 			<h1 className="text-3xl mb-4">Sachin Raja</h1>
 
 			<ul className="flex flex-col gap-2">
-				{releasedPosts.map((post) => (
+				{posts.map((post) => (
 					<li key={post.slug}>
 						<div className="flex flex-row items-center gap-2 text-lg">
 							<time

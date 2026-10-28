@@ -1,4 +1,4 @@
-import { withContentCollections } from '@content-collections/next'
+import createMDX from '@next/mdx'
 import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
@@ -18,4 +18,10 @@ const nextConfig: NextConfig = {
 	},
 }
 
-export default withContentCollections(nextConfig)
+const withMDX = createMDX({
+	options: {
+		rehypePlugins: [['@shikijs/rehype', { theme: 'github-dark' }]],
+	},
+})
+
+export default withMDX(nextConfig)

@@ -1,17 +1,14 @@
-import { MDXContent } from '@content-collections/mdx/react'
-import { allPosts } from 'content-collections'
 import type { Metadata } from 'next'
-import Image from 'next/image'
-import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import type { ComponentProps } from 'react'
 import { Footer } from '@/components/socials'
-import { getReleasedPosts } from '@/lib/utils'
+import { getPost, getPosts } from '@/lib/utils'
 
 export const dynamicParams = false
 
-export function generateStaticParams() {
-	return getReleasedPosts(allPosts).map((post) => ({ slug: post.slug }))
+export async function generateStaticParams() {
+	return getPosts()
+		.filter((post) => !post.draft)
+		.map((post) => ({ slug: post.slug }))
 }
 
 // stolen from bengubler.com
@@ -21,13 +18,8 @@ export async function generateMetadata({
 	params: Promise<{ slug: string }>
 }): Promise<Metadata> {
 	const { slug } = await params
-	const post = getReleasedPosts(allPosts).find((p) => p.slug === slug)
-
-	if (!post) {
-		return {
-			title: 'Post Not Found',
-		}
-	}
+	const post = getPost(slug)
+	if (!post || post.draft) return notFound()
 
 	const ogParams = new URLSearchParams({
 		title: post.title,
@@ -71,17 +63,16 @@ export default async function BlogPage({
 	params: Promise<{ slug: string }>
 }) {
 	const { slug } = await params
-	const post = allPosts.find((post) => post.slug === slug)
-
-	if (!post) return notFound()
+	const post = getPost(slug)
+	if (!post || post.draft) return notFound()
 
 	return (
 		<main className="m-10">
 			<div className="max-w-3xl mx-auto">
 				<div className="flex flex-col gap-2">
 					<h1 className="text-2xl font-bold font-mono">{post.title}</h1>
-					<time dateTime={post.publishedAt.toISOString()}>
-						{post.publishedAt.toLocaleDateString('en-us', {
+					<time dateTime={new Date(post.publishedAt).toISOString()}>
+						{new Date(post.publishedAt).toLocaleDateString('en-us', {
 							day: 'numeric',
 							month: 'long',
 							year: 'numeric',
@@ -89,52 +80,8 @@ export default async function BlogPage({
 					</time>
 				</div>
 
-				<div className="text-lg">
-					<MDXContent
-						code={post.mdx}
-						components={{
-							h2(props: ComponentProps<'h2'>) {
-								return (
-									<h2
-										className="text-xl font-semibold font-mono tracking-wider my-2"
-										{...props}
-									/>
-								)
-							},
-							p(props: ComponentProps<'p'>) {
-								return <p className="my-4" {...props} />
-							},
-							img({ src, ...props }: ComponentProps<typeof Image>) {
-								return (
-									<Image
-										src={src}
-										width={1000}
-										height={100}
-										className="my-4 max-w-full h-auto rounded-lg"
-										sizes=""
-										{...props}
-									/>
-								)
-							},
-							a({ href, ...props }: ComponentProps<typeof Link>) {
-								return (
-									<Link
-										href={href}
-										className="text-blue-500 hover:underline"
-										{...props}
-									/>
-								)
-							},
-							ol(props: ComponentProps<'ol'>) {
-								return (
-									<ol
-										className="list-decimal list-inside my-4 flex flex-col gap-2"
-										{...props}
-									/>
-								)
-							},
-						}}
-					/>
+				<div className="mt-2 prose lg:prose-lg prose-invert prose-headings:font-mono prose-h1:text-2xl prose-h2:text-xl prose-h3:text-lg prose-h4:text-base">
+					<post.Component />
 				</div>
 
 				<footer className="mt-5">
